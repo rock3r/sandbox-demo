@@ -1,7 +1,7 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    kotlin("jvm")
+    kotlin("multiplatform")
     id("org.jetbrains.compose")
 }
 
@@ -14,9 +14,18 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    implementation(compose.desktop.currentOs) {
-        exclude(group = "org.jetbrains.compose.material")
+kotlin {
+    jvm()
+
+    sourceSets {
+        commonMain.dependencies {
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.components.uiToolingPreview)
+        }
+        jvmMain.dependencies {
+            implementation(compose.desktop.currentOs)
+        }
     }
 }
 
