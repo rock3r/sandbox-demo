@@ -32,6 +32,8 @@ build/
 .idea/*
 out/
 local.properties
+.kotlin
+kotlin-js-store
 
 # IDEA/Android Studio project settings ignore exceptions
 !.idea/codeStyles/

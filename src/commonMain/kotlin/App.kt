@@ -1,5 +1,6 @@
-import LookupResult.*
-import androidx.compose.desktop.ui.tooling.preview.Preview
+import LookupResult.Empty
+import LookupResult.Occupied
+import LookupResult.OutOfBounds
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,59 +10,62 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableFloatState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.input.pointer.*
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.unit.*
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.application
-import androidx.compose.ui.window.rememberWindowState
-import kotlin.math.roundToInt
-import kotlin.random.Random
-import kotlin.time.Duration.Companion.seconds
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.toOffset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlin.math.roundToInt
+import kotlin.random.Random
+import kotlin.time.Duration.Companion.seconds
 
 private const val DEBUG_DRAW = false
 private const val LOGGING = false
 
-fun main() = application {
-    val state = rememberWindowState(position = WindowPosition.Aligned(Alignment.Center))
-    val cellSize = 5
-    Window(
-        title = "Sandbox",
-        onCloseRequest = ::exitApplication,
-        resizable = false,
-        state = state,
-    ) {
-        BoxWithConstraints(Modifier.fillMaxSize()) {
-            val widthPx = with(LocalDensity.current) { maxWidth.toPx().toInt() }
-            val heightPx = with(LocalDensity.current) { maxHeight.toPx().toInt() }
-            val cellSizePx = with(LocalDensity.current) { cellSize.dp.toPx() }
-            val width = (widthPx / cellSizePx).toInt()
-            val height = (heightPx / cellSizePx).toInt()
+@Composable
+fun app(cellSize: Int = 5) = BoxWithConstraints(Modifier.fillMaxSize()) {
+    val widthPx = with(LocalDensity.current) { maxWidth.toPx().toInt() }
+    val heightPx = with(LocalDensity.current) { maxHeight.toPx().toInt() }
+    val cellSizePx = with(LocalDensity.current) { cellSize.dp.toPx() }
+    val width = (widthPx / cellSizePx).toInt()
+    val height = (heightPx / cellSizePx).toInt()
 
-            LaunchedEffect(widthPx, heightPx) {
-                println("Canvas size: $widthPx*$heightPx -> unit $cellSizePx, grid $width*$height")
-            }
-
-            Content(cellSize.dp, width, height, 60)
-        }
+    LaunchedEffect(widthPx, heightPx) {
+        println("Canvas size: $widthPx*$heightPx -> unit $cellSizePx, grid $width*$height")
     }
+
+    Content(cellSize.dp, width, height, 60)
 }
 
 @Composable
